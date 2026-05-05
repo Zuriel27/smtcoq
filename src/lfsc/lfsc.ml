@@ -344,6 +344,10 @@ let string_logic ro f =
     (if SL.mem LBitvectors l then "BV" else "")
     (if SL.mem LLia l then "LIA" else "")
 
+
+
+
+(*This method is called if call_cvc4_abduct returns SAT*)
 let call_abduce i env rt ro ra rf root lsmt =
     let open Smtlib2_solver in
     let fl = Form.neg (snd root) in
@@ -380,14 +384,26 @@ let call_abduce i env rt ro ra rf root lsmt =
           (SmtCommands.abduct_string env rt ro ra rf (get_abduct_next cvc5)) :: produce_abducts (n-1) 
         else []) in
       let abducts = List.rev (produce_abducts (i - 1)) in
-        CoqInterface.error
-        ("cvc5 returned SAT.\nThe solver cannot prove the goal, but one of the following hypotheses (printed in Prop, but the corresponding Boolean versions also apply) would make it provable:\n" ^
-          abduct1^"\n"^(String.concat "\n" abducts))
+      let all_abducts = abduct1 :: abducts in
+      
+      let string_list = String.concat "; " all_abducts in
+      let final_list = "complete abduct list: [" ^ string_list ^ "]" in
+      Feedback.msg_info (Pp.str final_list);
+
+      let abduct_output = String.concat "\n* " all_abducts in
+      CoqInterface.error
+        ("BLAH! cvc5 returned SAT. Found " ^ (string_of_int (List.length all_abducts)) ^ 
+         " abduct:\n* " ^ abduct_output)
     in
 
     quit cvc5;
     proof
 
+(*abduct1 is the variable where the abducts are stored and in the end are printed by the tactic. 
+It seems to be that abduct1 is a string*)
+
+
+(*This method is being called by the tactic_gen_abduct tactic*)
 
 let call_cvc4_abduct i env rt ro ra rf root lsmt =
   let open Smtlib2_solver in
@@ -592,6 +608,8 @@ let tactic_gen vm_cast =
      *    the same ra and rf twice to have everything reifed *\)
      * SmtCommands.tactic call_cvc4 cvc4_logic rt ro ra rf ra rf vm_cast [] [] *)
 
+
+(*This is where the abduct is generated*)
 let tactic_gen_abduct i vm_cast lcpl lcepl =
   (* Transform the tuple of lemmas given by the user into a list *)
   let lcpl =
