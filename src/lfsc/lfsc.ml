@@ -345,6 +345,8 @@ let string_logic ro f =
     (if SL.mem LLia l then "LIA" else "")
 
 let call_abduce i env rt ro ra rf root lsmt =
+    let result_abducts = ref [] in
+
     let open Smtlib2_solver in
     let fl = Form.neg (snd root) in
     let solver_call = [| "cvc5"; "--produce-abducts"; "--incremental"; "--tlimit-per=60000"; "--dag-thresh=0"; "--no-sygus-core-connective" |] in
@@ -380,13 +382,14 @@ let call_abduce i env rt ro ra rf root lsmt =
           (SmtCommands.abduct_string env rt ro ra rf (get_abduct_next cvc5)) :: produce_abducts (n-1) 
         else []) in
       let abducts = List.rev (produce_abducts (i - 1)) in
+      result_abducts := abduct1 :: abducts;
         CoqInterface.error
         ("cvc5 returned SAT.\nThe solver cannot prove the goal, but one of the following hypotheses (printed in Prop, but the corresponding Boolean versions also apply) would make it provable:\n" ^
           abduct1^"\n"^(String.concat "\n" abducts))
     in
 
     quit cvc5;
-    proof
+    (proof, !result_abducts)
 
 
 let call_cvc4_abduct i env rt ro ra rf root lsmt =
