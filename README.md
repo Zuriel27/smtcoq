@@ -1,3 +1,22 @@
+# Benchmark.py
+Runs using the CoqGym file and determines which .v files can support SMTCoq. Make sure that tactics_path = "" contains the path to the tactics.v 
+
+Run with:
+python3 benchmark.py /path/to/coqgym/project
+
+# classify.py
+Classifies each theorem/lemma from the files found by benchmark.py. Make sure that tactics_path = "" contains the path to the tactics.v 
+
+Run with:
+python3 classify.py
+
+# abduceTesting.py
+Runs the main abductive automation pipeline. Make sure that tactics_path = "" contains the path to the tactics.v 
+file_generate.py is an earlier prototype of the automation process.  
+
+Run with:
+python3 automation.py
+
 # SMTCoq
 
 ## Presentation
