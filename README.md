@@ -1,3 +1,8 @@
+This project was evaluated using the CoqGym benchmark dataset. The CoqGym files are not included in this repository and must be downloaded separately. CoqGym can be obtained from the following link:
+https://github.com/princeton-vl/CoqGym
+
+After getting CoqGym, place the dataset directory in the project folder before running the benchmark and automation scripts.
+
 # Benchmark.py
 Runs using the CoqGym file and determines which .v files can support SMTCoq. Make sure that tactics_path = "" contains the path to the tactics.v 
 
